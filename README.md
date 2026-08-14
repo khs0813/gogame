@@ -9,7 +9,7 @@
 - 두 번 연속 패스 후 죽은 돌 확인과 최종 계가
 - 모바일과 13×13·19×19에서 후보 선택 → 확대 미리보기 → 착수 확정
 - 키보드 조작, 스크린리더 상태 알림, 반응형 디자인
-- 한국어 `/ko/`, 간체 중국어 `/zh-cn/`, 언어 선택 `/` 및 난이도별 정적 SEO 페이지 6개
+- 한국어 `/ko/`, 간체 중국어 `/zh-cn/`, 언어 선택 `/`, 난이도별 정적 SEO 페이지 6개 및 규칙 설명 페이지 2개
 - canonical, 상호 hreflang, Open Graph, JSON-LD, sitemap.xml, rss.xml, robots.txt 자동 생성
 - 대국·계가 상태 브라우저 저장, 외부 API·로그인·데이터베이스 불필요
 
@@ -30,7 +30,7 @@ npm run typecheck
 npm run validate
 ```
 
-`validate`는 프로덕션 빌드 후 9개 HTML 경로, canonical/hreflang, JSON-LD, sitemap/RSS/robots, AI Worker 번들을 함께 검사합니다. 빌드 결과는 `dist` 폴더에 생성됩니다.
+`validate`는 프로덕션 빌드 후 11개 HTML 경로, canonical/hreflang, JSON-LD, sitemap/RSS/robots, AI Worker 번들을 함께 검사합니다. 빌드 결과는 `dist` 폴더에 생성됩니다.
 
 ## Render Static Site 배포
 

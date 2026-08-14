@@ -8,6 +8,7 @@ const siteUrl = (process.env.SITE_URL || defaultSiteUrl).replace(/\/$/, "");
 
 const languageGroups = [
   { entries: ["/", "/ko/", "/zh-cn/"], ko: "/ko/", zh: "/zh-cn/", fallback: "/" },
+  { entries: ["/ko/rules/", "/zh-cn/rules/"], ko: "/ko/rules/", zh: "/zh-cn/rules/", fallback: "/ko/rules/" },
   { entries: ["/ko/course/beginner/", "/zh-cn/course/beginner/"], ko: "/ko/course/beginner/", zh: "/zh-cn/course/beginner/", fallback: "/ko/course/beginner/" },
   { entries: ["/ko/course/intermediate/", "/zh-cn/course/intermediate/"], ko: "/ko/course/intermediate/", zh: "/zh-cn/course/intermediate/", fallback: "/ko/course/intermediate/" },
   { entries: ["/ko/course/advanced/", "/zh-cn/course/advanced/"], ko: "/ko/course/advanced/", zh: "/zh-cn/course/advanced/", fallback: "/ko/course/advanced/" },
@@ -17,9 +18,9 @@ const rssItems = [
   {
     path: "/ko/",
     language: "ko",
-    title: "컴퓨터와 바둑 두기 | 초급·중급·고급 무료 온라인 바둑",
+    title: "바둑 한 수 | 무료 온라인 컴퓨터 바둑",
     description: [
-      "로그인 없이 초급·중급·고급 컴퓨터와 9·13·19줄 바둑을 두세요.",
+      "로그인 없이 9·13·19줄 바둑판에서 초급·중급·고급 컴퓨터와 대국하며 단수, 연결, 사활과 집 계산을 배웁니다.",
       "바둑 한 수는 설명만 읽는 대신 직접 돌을 놓으며 규칙과 전술을 익히는 무료 연습장입니다.",
       "작은 9줄 바둑부터 넓은 19줄 바둑까지 단계적으로 도전하고, 활로, 단수, 돌 잡기, 연결, 사활과 집 계산을 실전으로 배울 수 있습니다.",
       "대국 계산은 브라우저 안에서 진행되며 대국 기록과 설정은 현재 기기에만 저장됩니다.",
@@ -34,6 +35,26 @@ const rssItems = [
       "围棋一手不是只读说明，而是让你直接落子练习规则与战术的免费训练场。",
       "从节奏明快的9路棋盘开始，再逐步挑战13路和19路，在实战中学习气、打吃、连接、死活和计分。",
       "页面首次载入后，电脑计算在浏览器内完成，对局记录与设置也只保存在当前设备。",
+    ].join(" "),
+  },
+  {
+    path: "/ko/rules/",
+    language: "ko",
+    title: "바둑 규칙 자세히 보기 | 바둑 한 수",
+    description: [
+      "바둑의 목표, 착수, 활로와 단수, 돌 잡기, 자살수 금지, 패와 슈퍼코, 패스, 중국식 면적 계가와 백 7.5집 덤을 설명합니다.",
+      "바둑 한 수는 중국식 면적 계가를 사용하므로 살아 있는 돌과 둘러싼 빈 점을 합산해 최종 점수를 냅니다.",
+      "두 선수가 연속으로 패스하면 계가 단계로 넘어가며, 죽은 돌을 표시한 뒤 흑 면적과 백 면적에 덤을 반영해 승자를 결정합니다.",
+    ].join(" "),
+  },
+  {
+    path: "/zh-cn/rules/",
+    language: "zh-CN",
+    title: "围棋规则详细说明｜围棋一手",
+    description: [
+      "详细说明围棋目标、落子、气、打吃、提子、自杀禁手、劫、超级劫、停一手、中国规则面积计分和白贴7.5目。",
+      "围棋一手采用中国规则面积计分，最终分数由存活棋子和被己方围住的空点共同组成。",
+      "黑白双方连续停一手后进入计分阶段，标记死子后计算黑方面积与白方面积，并给白棋加上7.5目贴目。",
     ].join(" "),
   },
   {
@@ -197,6 +218,8 @@ export default defineConfig({
         root: resolve(import.meta.dirname, "index.html"),
         ko: resolve(import.meta.dirname, "ko/index.html"),
         zh: resolve(import.meta.dirname, "zh-cn/index.html"),
+        koRules: resolve(import.meta.dirname, "ko/rules/index.html"),
+        zhRules: resolve(import.meta.dirname, "zh-cn/rules/index.html"),
         koBeginner: resolve(import.meta.dirname, "ko/course/beginner/index.html"),
         koIntermediate: resolve(import.meta.dirname, "ko/course/intermediate/index.html"),
         koAdvanced: resolve(import.meta.dirname, "ko/course/advanced/index.html"),

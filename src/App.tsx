@@ -98,7 +98,215 @@ function resultText(language: Language, score: ReturnType<typeof calculateScore>
     : `${color}胜 · 领先 ${score.margin.toFixed(1)} 目`;
 }
 
+const rulePages = {
+  ko: {
+    title: "바둑 규칙 자세히 보기",
+    lead: "바둑 한 수는 초보자가 바로 대국을 시작할 수 있도록 중국식 면적 계가를 기준으로 규칙을 단순하고 일관되게 적용합니다.",
+    languageName: "한국어",
+    rulesLink: "바둑 규칙",
+    sections: [
+      {
+        heading: "1. 대국의 목표",
+        body: [
+          "바둑은 흑과 백이 번갈아 돌을 놓아 더 넓은 영역을 차지하는 게임입니다. 대국이 끝났을 때 살아 있는 내 돌과 내 돌이 둘러싼 빈 점을 합산해 점수를 냅니다.",
+          "이 사이트는 중국식 면적 계가를 사용합니다. 따라서 단순히 빈 집만 세는 방식이 아니라, 살아 있는 돌의 수와 둘러싼 빈 영역을 함께 계산합니다.",
+        ],
+      },
+      {
+        heading: "2. 착수와 차례",
+        body: [
+          "흑이 먼저 둡니다. 한 차례에는 비어 있는 교차점 하나에 돌을 놓거나 패스할 수 있습니다. 한 번 놓인 돌은 잡히기 전까지 움직이지 않습니다.",
+          "9줄, 13줄, 19줄 바둑판을 선택할 수 있으며 규칙은 모두 같습니다. 작은 판은 대국이 짧고 전투가 빠르게 나타나 입문 연습에 적합합니다.",
+        ],
+      },
+      {
+        heading: "3. 활로, 단수, 돌 잡기",
+        body: [
+          "돌의 상하좌우에 붙은 빈 교차점을 활로라고 합니다. 여러 돌이 상하좌우로 이어져 있으면 하나의 돌무리로 보고 활로를 함께 씁니다.",
+          "활로가 하나만 남은 상태를 단수라고 합니다. 상대 돌무리의 마지막 활로를 막으면 그 돌무리는 잡혀서 바둑판에서 사라지고, 잡은 돌 수가 기록됩니다.",
+        ],
+      },
+      {
+        heading: "4. 둘 수 없는 자리",
+        body: [
+          "이미 돌이 놓인 자리에는 둘 수 없습니다. 또한 돌을 놓은 뒤 내 돌무리의 활로가 하나도 없고 상대 돌도 잡지 못한다면 자살수로 보아 둘 수 없습니다.",
+          "단, 그 수로 상대 돌을 잡아 새 활로가 생기는 경우에는 착수할 수 있습니다. 그래서 겉으로는 위험해 보이는 자리라도 상대 돌의 마지막 활로라면 합법적인 수가 될 수 있습니다.",
+        ],
+      },
+      {
+        heading: "5. 패와 슈퍼코",
+        body: [
+          "패는 같은 돌을 바로 되잡으면 이전 모양이 반복되는 상황입니다. 이 사이트는 단순 패뿐 아니라 이전에 나온 같은 국면을 반복하지 못하게 하는 상황적 슈퍼코를 적용합니다.",
+          "따라서 어떤 수가 이전의 같은 차례 국면을 그대로 되풀이한다면 둘 수 없습니다. 반복을 피하려면 다른 곳에 먼저 두거나 패스해야 합니다.",
+        ],
+      },
+      {
+        heading: "6. 패스와 대국 종료",
+        body: [
+          "둘 곳이 더 이상 크지 않다고 판단하면 패스할 수 있습니다. 흑과 백이 연속으로 패스하면 대국은 계가 단계로 넘어갑니다.",
+          "계가 단계에서는 죽었다고 판단한 돌무리를 클릭해 죽은 돌로 표시합니다. 잘못 표시했다면 같은 돌무리를 다시 클릭해 복구할 수 있습니다.",
+        ],
+      },
+      {
+        heading: "7. 계가와 덤",
+        body: [
+          "최종 점수는 살아 있는 돌과 둘러싼 빈 영역을 합산한 면적 점수입니다. 흑 점수는 흑의 면적, 백 점수는 백의 면적에 덤을 더한 값입니다.",
+          "이 사이트는 백에게 7.5집 덤을 줍니다. 덤의 0.5집 때문에 동점이 나오지 않으며, 최종 화면에는 승자와 점수 차이가 표시됩니다.",
+        ],
+      },
+      {
+        heading: "8. 이 사이트의 보조 기능",
+        body: [
+          "모바일과 큰 바둑판에서는 실수 착수를 줄이기 위해 선택한 자리를 한 번 더 확인한 뒤 착수합니다. 힌트는 현재 국면에서 연습용 AI가 추천하는 후보 수를 보여줍니다.",
+          "한 수 무르기, 새 대국, 난이도 변경은 학습 편의를 위한 기능입니다. 고급 난이도도 전문 기사 수준이 아니라 브라우저 안에서 동작하는 연습용 AI입니다.",
+        ],
+      },
+    ],
+  },
+  "zh-cn": {
+    title: "围棋规则详细说明",
+    lead: "围棋一手采用中国规则面积计分，帮助初学者在网页中直接对弈并理解每一步为什么合法、何时结束以及如何计分。",
+    languageName: "简体中文",
+    rulesLink: "围棋规则",
+    sections: [
+      {
+        heading: "1. 对局目标",
+        body: [
+          "围棋由黑白双方轮流落子，目标是在棋盘上取得更大的面积。对局结束时，计算双方存活棋子以及被己方围住的空点。",
+          "本站采用中国规则面积计分，因此不是只数空点，而是把存活棋子和围住的空点一起计入分数。",
+        ],
+      },
+      {
+        heading: "2. 落子与轮次",
+        body: [
+          "黑棋先行。每一手可以在空交叉点落子，也可以选择停一手。落在棋盘上的棋子在被提走之前不会移动。",
+          "9路、13路和19路棋盘使用同一套规则。小棋盘对局较短，局部战斗更频繁，适合入门练习。",
+        ],
+      },
+      {
+        heading: "3. 气、打吃与提子",
+        body: [
+          "棋子上下左右相邻的空交叉点叫作气。多个棋子通过上下左右连接后视为同一块棋，共用所有气。",
+          "只剩一口气的棋块处于打吃状态。占据对方棋块最后一口气后，该棋块会被提走，并记录为提子。",
+        ],
+      },
+      {
+        heading: "4. 不能落子的情况",
+        body: [
+          "已有棋子的交叉点不能落子。如果落子后己方棋块没有任何气，并且没有提掉对方棋子，则属于自杀，不能落子。",
+          "如果这一手能够提掉对方棋子并产生新的气，即使看起来落在危险位置，也仍然是合法着法。",
+        ],
+      },
+      {
+        heading: "5. 劫与超级劫",
+        body: [
+          "劫是立即回提会重复前一局面的情况。本站不仅禁止普通劫的立即回提，也采用情境超级劫，避免同一方行棋时重复之前出现过的局面。",
+          "如果某一手会让棋盘回到之前同一方行棋时出现过的局面，就不能落子。可以先在其他地方落子，或选择停一手。",
+        ],
+      },
+      {
+        heading: "6. 停一手与终局",
+        body: [
+          "当你认为棋盘上已经没有价值更大的落点时，可以停一手。黑白双方连续停一手后，对局进入计分阶段。",
+          "计分阶段可以点击判断为死棋的棋块，将整块相连棋子标记为死子；如果标错，再次点击即可恢复。",
+        ],
+      },
+      {
+        heading: "7. 计分与贴目",
+        body: [
+          "最终分数按照面积计算：黑方计算黑棋面积，白方计算白棋面积并加上贴目。",
+          "本站白棋贴7.5目。0.5目可以避免平局，最终结果会显示胜者和领先目数。",
+        ],
+      },
+      {
+        heading: "8. 本站辅助功能",
+        body: [
+          "在手机或较大棋盘上，为减少误点，需要再次确认所选位置后才会正式落子。提示功能会显示练习型AI在当前局面下推荐的候选点。",
+          "悔棋、重新开局和难度切换都是为了学习方便。高级难度仍是浏览器内运行的练习AI，并非职业棋手水平。",
+        ],
+      },
+    ],
+  },
+};
+
+function rulesPath(language: Language): string {
+  return `/${language}/rules/`;
+}
+
+function SiteHeader({
+  language,
+  text,
+  alternateHref,
+  rulesCurrent = false,
+}: {
+  language: Language;
+  text: (typeof copy)[Language];
+  alternateHref: string;
+  rulesCurrent?: boolean;
+}) {
+  const otherLanguage: Language = language === "ko" ? "zh-cn" : "ko";
+  return (
+    <header className="site-header">
+      <a className="brand" href={`/${language}/`} aria-label={text.brand}>
+        <span className="brand-mark" aria-hidden="true"><i /><i /></span>
+        <span>{text.brand}</span>
+      </a>
+      <div className="header-actions">
+        <nav className="site-nav" aria-label={language === "ko" ? "주요 메뉴" : "主菜单"}>
+          <a href={rulesPath(language)} aria-current={rulesCurrent ? "page" : undefined}>
+            {rulePages[language].rulesLink}
+          </a>
+        </nav>
+        <nav className="language-nav" aria-label={text.language}>
+          <span>{rulePages[language].languageName}</span>
+          <a href={alternateHref} lang={otherLanguage === "ko" ? "ko" : "zh-CN"}>
+            {rulePages[otherLanguage].languageName}
+          </a>
+        </nav>
+      </div>
+    </header>
+  );
+}
+
+function RulesPage() {
+  const language = getLanguage();
+  const text = copy[language];
+  const page = rulePages[language];
+  const otherLanguage: Language = language === "ko" ? "zh-cn" : "ko";
+  return (
+    <>
+      <SiteHeader language={language} text={text} alternateHref={rulesPath(otherLanguage)} rulesCurrent />
+      <main className="rules-page">
+        <section className="rules-hero" aria-labelledby="rules-title">
+          <p className="eyebrow">{language === "ko" ? "BADUK RULES" : "GO RULES"}</p>
+          <h1 id="rules-title">{page.title}</h1>
+          <p>{page.lead}</p>
+        </section>
+        <article className="rules-article">
+          {page.sections.map((section) => (
+            <section key={section.heading}>
+              <h2>{section.heading}</h2>
+              {section.body.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+            </section>
+          ))}
+          <nav aria-label={language === "ko" ? "규칙 관련 이동" : "规则相关链接"}>
+            <a href={`/${language}/`}>{language === "ko" ? "대국 시작하기" : "开始对局"}</a>
+            <a href={`/${language}/course/beginner/`}>{language === "ko" ? "초급 코스" : "初级课程"}</a>
+            <a href={`/${language}/course/intermediate/`}>{language === "ko" ? "중급 코스" : "中级课程"}</a>
+            <a href={`/${language}/course/advanced/`}>{language === "ko" ? "고급 코스" : "高级课程"}</a>
+          </nav>
+        </article>
+      </main>
+    </>
+  );
+}
+
 export default function App() {
+  if (document.body.dataset.page === "rules") return <RulesPage />;
+  return <GameApp />;
+}
+
+function GameApp() {
   const language = getLanguage();
   const text = copy[language];
   const pageCourse = document.body.dataset.course as Difficulty | undefined;
@@ -120,6 +328,8 @@ export default function App() {
   const hintTimer = useRef<number | null>(null);
   const hintWorker = useRef<Worker | null>(null);
   const latestFingerprint = useRef(gameFingerprint(game));
+  const boardFrameRef = useRef<HTMLDivElement>(null);
+  const initialBoardScrollDone = useRef(false);
   latestFingerprint.current = gameFingerprint(game);
 
   const isHumanTurn = game.status === "playing" && game.currentPlayer === playerColor && !thinking;
@@ -175,6 +385,21 @@ export default function App() {
     if (hintTimer.current !== null) window.clearTimeout(hintTimer.current);
     hintWorker.current?.terminate();
   }, []);
+
+  useEffect(() => {
+    if (initialBoardScrollDone.current || pageCourse || window.location.hash || window.scrollY > 8) return;
+    const frame = boardFrameRef.current;
+    const board = frame?.querySelector<SVGSVGElement>(".go-board");
+    if (!frame || !board) return;
+
+    initialBoardScrollDone.current = true;
+    const isCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.requestAnimationFrame(() => {
+      frame.scrollIntoView({ behavior: isCoarsePointer || prefersReducedMotion ? "auto" : "smooth", block: "center", inline: "nearest" });
+      if (!isCoarsePointer) board.focus({ preventScroll: true });
+    });
+  }, [pageCourse]);
 
   useEffect(() => {
     setCursor({ x: Math.floor(game.size / 2), y: Math.floor(game.size / 2) });
@@ -443,8 +668,6 @@ export default function App() {
   const lastMove = game.lastMove ? coordinateLabel(game.lastMove, game.size) : text.none;
   const userCaptured = playerColor === BLACK ? game.captures.black : game.captures.white;
   const computerCaptured = computerColor === BLACK ? game.captures.black : game.captures.white;
-  const otherLanguage: Language = language === "ko" ? "zh-cn" : "ko";
-
   const handleCourseKeyDown = (event: ReactKeyboardEvent<HTMLButtonElement>, course: Difficulty) => {
     if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) return;
     event.preventDefault();
@@ -463,18 +686,7 @@ export default function App() {
 
   return (
     <>
-      <header className="site-header">
-        <a className="brand" href={`/${language}/`} aria-label={text.brand}>
-          <span className="brand-mark" aria-hidden="true"><i /><i /></span>
-          <span>{text.brand}</span>
-        </a>
-        <nav className="language-nav" aria-label={text.language}>
-          <span>{language === "ko" ? "한국어" : "简体中文"}</span>
-          <a href={alternatePath(language, pageCourse)} lang={otherLanguage === "ko" ? "ko" : "zh-CN"}>
-            {language === "ko" ? "简体中文" : "한국어"}
-          </a>
-        </nav>
-      </header>
+      <SiteHeader language={language} text={text} alternateHref={alternatePath(language, pageCourse)} />
 
       <main>
         <section className="hero-copy" aria-labelledby="game-title">
@@ -501,7 +713,7 @@ export default function App() {
                 ? "바둑판 조작: 화살표 키로 교차점을 이동하고 Enter 또는 Space로 선택하거나 착수합니다. Esc는 선택 취소, P는 패스입니다."
                 : "棋盘操作：用方向键移动交叉点，按 Enter 或空格选择或落子，Esc 取消，P 停一手。"}
             </p>
-            <div className={`board-frame ${thinking ? "is-thinking" : ""}`}>
+            <div ref={boardFrameRef} className={`board-frame ${thinking ? "is-thinking" : ""}`}>
               <Board
                 state={game}
                 pending={pending}

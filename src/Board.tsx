@@ -64,6 +64,7 @@ export default function Board({
   const svgRef = useRef<SVGSVGElement>(null);
   const pointerStart = useRef<ActivePointer | null>(null);
   const [touchPreview, setTouchPreview] = useState<Point | null>(null);
+  const [hoverPoint, setHoverPoint] = useState<Point | null>(null);
   const [keyboardCursor, setKeyboardCursor] = useState(false);
   const step = (viewSize - padding * 2) / (state.size - 1);
 
@@ -103,10 +104,15 @@ export default function Board({
   };
 
   const handlePointerMove = (event: PointerEvent<SVGSVGElement>) => {
+    const point = pointFromClient(event.clientX, event.clientY);
+    if (event.pointerType !== "touch" && !disabled) {
+      setKeyboardCursor(false);
+      setHoverPoint(point);
+    }
     const active = pointerStart.current;
     if (!active || active.id !== event.pointerId) return;
     if (Math.hypot(event.clientX - active.x, event.clientY - active.y) > 10) active.moved = true;
-    setTouchPreview(pointFromClient(event.clientX, event.clientY));
+    setTouchPreview(point);
   };
 
   const handlePointerUp = (event: PointerEvent<SVGSVGElement>) => {
@@ -121,6 +127,11 @@ export default function Board({
 
   const handlePointerCancel = (event: PointerEvent<SVGSVGElement>) => {
     clearPointer(event);
+    setHoverPoint(null);
+  };
+
+  const handlePointerLeave = () => {
+    if (!pointerStart.current) setHoverPoint(null);
   };
 
   const handleKeyDown = (event: KeyboardEvent<SVGSVGElement>) => {
@@ -164,6 +175,8 @@ export default function Board({
       ? stoneLabels.black
       : stoneLabels.white;
   const cursorDead = deadStones.has(cursorIndex) ? `, ${stoneLabels.dead}` : "";
+  const canHover = !disabled && (state.status === "playing" || state.status === "scoring");
+  const visibleHover = canHover && hoverPoint && !keyboardCursor ? hoverPoint : null;
   const previewPoint = showMagnifier && state.status === "playing" ? touchPreview ?? pending : null;
 
   return (
@@ -184,6 +197,7 @@ export default function Board({
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerCancel}
       onLostPointerCapture={handlePointerCancel}
+      onPointerLeave={handlePointerLeave}
       onKeyDown={handleKeyDown}
     >
       <title>{label}</title>
@@ -272,6 +286,29 @@ export default function Board({
             <circle cx={cx} cy={cy} r={radius} fill="none" stroke="#101d18" strokeWidth="16" />
             <circle cx={cx} cy={cy} r={radius} fill="none" stroke="#fff" strokeWidth="10" />
             <circle cx={cx} cy={cy} r={radius} fill="none" stroke="#a51e18" strokeWidth="5" />
+          </g>
+        );
+      })()}
+
+      {visibleHover && (() => {
+        const { cx, cy } = toSvg(visibleHover);
+        const index = pointToIndex(visibleHover, state.size);
+        const occupied = state.board[index] !== EMPTY;
+        const radius = Math.min(step * 0.42, state.size === 19 ? 22 : 38);
+        return (
+          <g className={`mouse-board-cursor ${occupied ? "is-blocked" : ""}`} pointerEvents="none">
+            <line x1={cx - radius * 1.35} x2={cx + radius * 1.35} y1={cy} y2={cy} />
+            <line x1={cx} x2={cx} y1={cy - radius * 1.35} y2={cy + radius * 1.35} />
+            {!occupied && state.status === "playing" && (
+              <circle
+                className="cursor-stone"
+                cx={cx}
+                cy={cy}
+                r={Math.min(step * 0.36, state.size === 19 ? 19 : 33)}
+                fill={state.currentPlayer === BLACK ? "#111714" : "#f7f4ed"}
+              />
+            )}
+            <circle className="cursor-ring" cx={cx} cy={cy} r={radius} />
           </g>
         );
       })()}

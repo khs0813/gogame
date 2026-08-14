@@ -8,6 +8,8 @@ const pages = [
   { path: "/", lang: "ko" },
   { path: "/ko/", lang: "ko" },
   { path: "/zh-cn/", lang: "zh-CN" },
+  { path: "/ko/rules/", lang: "ko", page: "rules" },
+  { path: "/zh-cn/rules/", lang: "zh-CN", page: "rules" },
   { path: "/ko/course/beginner/", lang: "ko", course: "beginner" },
   { path: "/ko/course/intermediate/", lang: "ko", course: "intermediate" },
   { path: "/ko/course/advanced/", lang: "ko", course: "advanced" },
@@ -39,6 +41,7 @@ for (const page of pages) {
   if (page.path === "/") assert(html.includes('class="language-cards"'), "/: missing language chooser");
   else assert(html.includes('id="app"'), `${page.path}: missing app mount`);
   if (page.course) assert(html.includes(`data-course="${page.course}"`), `${page.path}: incorrect course data`);
+  if (page.page) assert(html.includes(`data-page="${page.page}"`), `${page.path}: incorrect page data`);
 
   for (const match of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
     JSON.parse(match[1]);
@@ -57,8 +60,8 @@ const rss = await readFile(resolve(distRoot, "rss.xml"), "utf8");
 assert(rss.includes('<rss version="2.0"'), "rss: missing RSS 2.0 root");
 assert(rss.includes(`href="${siteUrl}/rss.xml"`), "rss: missing self link");
 assert((rss.match(/<item>/g) || []).length === rssPages.length, "rss: incorrect item count");
-assert((rss.match(/<dc:language>ko<\/dc:language>/g) || []).length === 4, "rss: incomplete Korean items");
-assert((rss.match(/<dc:language>zh-CN<\/dc:language>/g) || []).length === 4, "rss: incomplete Chinese items");
+assert((rss.match(/<dc:language>ko<\/dc:language>/g) || []).length === rssPages.filter((page) => page.lang === "ko").length, "rss: incomplete Korean items");
+assert((rss.match(/<dc:language>zh-CN<\/dc:language>/g) || []).length === rssPages.filter((page) => page.lang === "zh-CN").length, "rss: incomplete Chinese items");
 for (const page of rssPages) assert(rss.includes(`<link>${siteUrl}${page.path}</link>`), `rss: missing ${page.path}`);
 
 const robots = await readFile(resolve(distRoot, "robots.txt"), "utf8");
