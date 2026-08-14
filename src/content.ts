@@ -219,7 +219,7 @@ export const copy: Record<Language, Copy> = {
     restored: "已恢复保存在本设备上的对局。",
     confirmReset: "要结束当前对局并重新开始吗？",
     rules: "对局规则",
-    ruleSummary: "中国规则面积计分 · 白贴7.5目 · 禁止自杀 · 情境超级劫 · 连续两次停一手后计分",
+    ruleSummary: "中国规则面积计分 · 白棋贴7.5目 · 禁止自杀着法 · 情境超级劫 · 连续两次停一手后计分",
     aiNotice: "高级课程仍是较强的休闲练习AI，并非职业棋手水平。",
     localNotice: "对局与设置只保存在当前浏览器中，不会上传。",
     keyboardHelp: "键盘：方向键移动，Enter选择或落子，Esc取消",
