@@ -1,0 +1,16 @@
+{
+  "name": "바둑 한 수 | 围棋一手",
+  "short_name": "바둑 한 수",
+  "start_url": "/ko/",
+  "display": "standalone",
+  "background_color": "#f4efe4",
+  "theme_color": "#17372d",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
