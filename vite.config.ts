@@ -6,6 +6,7 @@ import react from "@vitejs/plugin-react";
 const defaultSiteUrl = "https://www.weiqigoplay.com";
 const siteUrl = (process.env.SITE_URL || defaultSiteUrl).replace(/\/$/, "");
 const googleSiteVerification = "43sVorkkUr7TBGfVu3khYLAtG1-110SLL7f5OqsNHZI";
+const naverSiteVerification = "a0fa62b363c3d940182ce92917fef4248ef8a9bc";
 
 const languageGroups = [
   { entries: ["/", "/ko/", "/zh-cn/"], ko: "/ko/", zh: "/zh-cn/", fallback: "/" },
@@ -148,10 +149,11 @@ function seoPlugin(): Plugin {
     transformIndexHtml(html) {
       const mobileMeta = '    <meta name="applicable-device" content="pc,mobile" />';
       const googleMeta = `    <meta name="google-site-verification" content="${googleSiteVerification}" />`;
+      const naverMeta = `    <meta name="naver-site-verification" content="${naverSiteVerification}" />`;
       const rssLink = `    <link rel="alternate" type="application/rss+xml" title="바둑 한 수 RSS" href="${siteUrl}/rss.xml" />`;
       return html
         .replaceAll("__SITE_URL__", siteUrl)
-        .replace("  </head>", `${mobileMeta}\n${googleMeta}\n${rssLink}\n  </head>`);
+        .replace("  </head>", `${mobileMeta}\n${googleMeta}\n${naverMeta}\n${rssLink}\n  </head>`);
     },
     closeBundle() {
       const now = new Date();

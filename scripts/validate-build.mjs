@@ -5,6 +5,7 @@ const projectRoot = resolve(import.meta.dirname, "..");
 const distRoot = resolve(projectRoot, "dist");
 const siteUrl = (process.env.SITE_URL || "https://www.weiqigoplay.com").replace(/\/$/, "");
 const googleSiteVerification = "43sVorkkUr7TBGfVu3khYLAtG1-110SLL7f5OqsNHZI";
+const naverSiteVerification = "a0fa62b363c3d940182ce92917fef4248ef8a9bc";
 const adfitSdkUrl = "https://t1.kakaocdn.net/kas/static/ba.min.js";
 const adfitUnitIdPrefix = ["D", "A", "N", "-"].join("");
 const pages = [
@@ -74,6 +75,7 @@ for (const page of pages) {
   assert(html.includes("<meta name=\"description\""), `${page.path}: missing description`);
   assert(html.includes('name="applicable-device" content="pc,mobile"'), `${page.path}: missing Baidu mobile device hint`);
   assert(html.includes(`name="google-site-verification" content="${googleSiteVerification}"`), `${page.path}: missing Google site verification`);
+  assert(html.includes(`name="naver-site-verification" content="${naverSiteVerification}"`), `${page.path}: missing Naver site verification`);
   assert(html.includes('type="application/rss+xml"'), `${page.path}: missing RSS discovery link`);
   assert(html.includes(`rel="canonical" href="${siteUrl}${page.path}"`), `${page.path}: incorrect canonical`);
   assert(html.includes('hreflang="ko"'), `${page.path}: missing Korean alternate`);
