@@ -27,7 +27,6 @@ import {
 
 const storageKey = "baduk-one-session-v2";
 const courseOrder: Difficulty[] = ["beginner", "intermediate", "advanced"];
-let stoneAudioContext: AudioContext | null = null;
 
 interface Session {
   game: GameState;
@@ -89,58 +88,6 @@ function seedFor(game: GameState): number {
     seed = Math.imul(seed ^ (game.board[index] + index + 1), 16777619);
   }
   return seed >>> 0;
-}
-
-function playStoneSound() {
-  const AudioContextConstructor = window.AudioContext ?? (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-  if (!AudioContextConstructor) return;
-
-  stoneAudioContext ??= new AudioContextConstructor();
-  const context = stoneAudioContext;
-  void context.resume();
-
-  const start = context.currentTime;
-  const output = context.createGain();
-  output.gain.setValueAtTime(0.0001, start);
-  output.gain.linearRampToValueAtTime(0.22, start + 0.006);
-  output.gain.exponentialRampToValueAtTime(0.0001, start + 0.14);
-  output.connect(context.destination);
-
-  const body = context.createOscillator();
-  const bodyGain = context.createGain();
-  body.type = "triangle";
-  body.frequency.setValueAtTime(170, start);
-  body.frequency.exponentialRampToValueAtTime(82, start + 0.13);
-  bodyGain.gain.setValueAtTime(0.75, start);
-  bodyGain.gain.exponentialRampToValueAtTime(0.0001, start + 0.13);
-  body.connect(bodyGain).connect(output);
-  body.start(start);
-  body.stop(start + 0.15);
-
-  const buffer = context.createBuffer(1, Math.floor(context.sampleRate * 0.055), context.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let index = 0; index < data.length; index += 1) {
-    const progress = index / data.length;
-    data[index] = (Math.random() * 2 - 1) * (1 - progress) ** 2;
-  }
-
-  const strike = context.createBufferSource();
-  const strikeFilter = context.createBiquadFilter();
-  strike.buffer = buffer;
-  strikeFilter.type = "bandpass";
-  strikeFilter.frequency.setValueAtTime(980, start);
-  strikeFilter.Q.setValueAtTime(0.9, start);
-  strike.connect(strikeFilter).connect(output);
-  strike.start(start);
-  strike.stop(start + 0.06);
-
-  body.onended = () => {
-    body.disconnect();
-    bodyGain.disconnect();
-    strike.disconnect();
-    strikeFilter.disconnect();
-    output.disconnect();
-  };
 }
 
 function resultText(language: Language, score: ReturnType<typeof calculateScore>): string {
@@ -1391,7 +1338,6 @@ function GameApp() {
     setUndoStack((previous) => [...previous, game]);
     setGame(result.state);
     setPending(null);
-    playStoneSound();
     setAnnouncement(`${text.movePlayed} ${coordinateLabel(point, game.size)}`);
   };
 
