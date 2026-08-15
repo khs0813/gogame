@@ -40,7 +40,7 @@ npm run validate
 - Publish directory: `dist`
 - 환경변수 `SITE_URL`: 실제 배포 주소 또는 커스텀 도메인(예: `https://example.com`)
 
-기본값은 `https://baduk-ai-course.onrender.com`입니다. Render 서비스 이름을 바꾸거나 커스텀 도메인을 사용한다면 `SITE_URL`을 반드시 실제 주소로 변경해야 canonical, sitemap, robots 주소가 일치합니다.
+기본값은 `https://www.weiqigoplay.com`입니다. Render 서비스 이름을 바꾸거나 커스텀 도메인을 사용한다면 `SITE_URL`을 반드시 실제 주소로 변경해야 canonical, sitemap, robots 주소가 일치합니다.
 
 배포 후 다음 작업을 권장합니다.
 

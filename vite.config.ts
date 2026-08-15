@@ -3,7 +3,7 @@ import { writeFileSync } from "node:fs";
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 
-const defaultSiteUrl = "https://baduk-ai-course.onrender.com";
+const defaultSiteUrl = "https://www.weiqigoplay.com";
 const siteUrl = (process.env.SITE_URL || defaultSiteUrl).replace(/\/$/, "");
 const googleSiteVerification = "43sVorkkUr7TBGfVu3khYLAtG1-110SLL7f5OqsNHZI";
 

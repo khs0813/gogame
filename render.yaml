@@ -6,7 +6,7 @@ services:
     staticPublishPath: ./dist
     envVars:
       - key: SITE_URL
-        value: https://baduk-ai-course.onrender.com
+        value: https://www.weiqigoplay.com
     headers:
       - path: /*
         name: X-Content-Type-Options

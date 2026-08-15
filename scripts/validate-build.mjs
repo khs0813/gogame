@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 
 const projectRoot = resolve(import.meta.dirname, "..");
 const distRoot = resolve(projectRoot, "dist");
-const siteUrl = (process.env.SITE_URL || "https://baduk-ai-course.onrender.com").replace(/\/$/, "");
+const siteUrl = (process.env.SITE_URL || "https://www.weiqigoplay.com").replace(/\/$/, "");
 const googleSiteVerification = "43sVorkkUr7TBGfVu3khYLAtG1-110SLL7f5OqsNHZI";
 const adfitSdkUrl = "https://t1.kakaocdn.net/kas/static/ba.min.js";
 const adfitUnitIdPrefix = ["D", "A", "N", "-"].join("");
