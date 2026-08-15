@@ -1172,7 +1172,7 @@ function GameApp() {
   latestFingerprint.current = gameFingerprint(game);
 
   const isHumanTurn = game.status === "playing" && game.currentPlayer === playerColor && !thinking;
-  const mustConfirm = coarsePointer || game.size >= 13;
+  const mustConfirm = !coarsePointer && game.size >= 13;
   const computerColor = opponent(playerColor);
   const score = useMemo(() => calculateScore(game, deadStones), [game, deadStones]);
   const canUndo = !thinking && game.status === "playing" && undoStack.length >= 2 && game.currentPlayer === playerColor;
