@@ -27,6 +27,54 @@ body {
   padding-left: env(safe-area-inset-left);
   background: var(--paper);
 }
+
+.page-frame,
+.page-scroll-region {
+  display: contents;
+}
+
+#adfit-mobile-root {
+  display: none;
+}
+
+html.adfit-mobile-active,
+html.adfit-mobile-active body {
+  height: 100%;
+  overflow: hidden;
+}
+
+html.adfit-mobile-active .page-frame {
+  height: 100vh;
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+html.adfit-mobile-active .page-scroll-region {
+  min-height: 0;
+  display: block;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  scroll-padding-bottom: 24px;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+html.adfit-mobile-active #adfit-mobile-root {
+  min-height: calc(66px + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding:
+    16px
+    max(0px, env(safe-area-inset-right))
+    env(safe-area-inset-bottom)
+    max(0px, env(safe-area-inset-left));
+  border-top: 1px solid rgba(23, 39, 32, 0.16);
+  background: var(--paper);
+}
 button, select { font: inherit; }
 button, a, select, summary { -webkit-tap-highlight-color: transparent; }
 a { color: inherit; }
@@ -102,6 +150,10 @@ main { width: min(1440px, calc(100% - 48px)); margin: 0 auto; }
 .board-column { padding: clamp(14px, 2vw, 28px); }
 .control-panel { padding: 26px; position: sticky; top: 18px; }
 .control-panel > section + section, .control-panel > section + details, .control-panel > details { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--line); }
+.adfit-desktop-rail { display: none; }
+.adfit-slot-shell { flex: 0 0 auto; overflow: hidden; }
+.adfit-slot-shell--desktop-right { width: 160px; height: 600px; }
+.adfit-slot-shell--mobile-bottom { width: 320px; height: 50px; max-width: none; }
 
 .game-status { min-height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 16px; }
 .turn-status { display: flex; align-items: center; gap: 13px; min-width: 0; }
@@ -283,6 +335,24 @@ button.ghost { background: transparent; }
 
 @keyframes pulse { 50% { transform: scale(.75); opacity: .65; } }
 @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-8px); } }
+
+@media (min-width: 1280px) {
+  .game-shell.has-desktop-ad {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 340px) 176px;
+    column-gap: 24px;
+  }
+
+  .adfit-desktop-rail {
+    width: 160px;
+    min-width: 160px;
+    min-height: 600px;
+    display: block;
+    position: sticky;
+    top: 18px;
+    align-self: start;
+    justify-self: end;
+  }
+}
 
 @media (max-width: 1040px) {
   .game-shell { grid-template-columns: 1fr; }

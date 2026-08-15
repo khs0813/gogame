@@ -1,5 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { createPortal } from "react-dom";
+import AdFitSlot from "./AdFitSlot";
 import Board, { coordinateLabel } from "./Board";
+import { selectInitialAdVariant, type AdVariant } from "./adfit";
 import { alternatePath, copy, getInitialDifficulty, getLanguage, type Language } from "./content";
 import { chooseAiMove } from "./game/ai";
 import {
@@ -27,6 +30,8 @@ import {
 
 const storageKey = "baduk-one-session-v2";
 const courseOrder: Difficulty[] = ["beginner", "intermediate", "advanced"];
+const desktopUnit = import.meta.env.VITE_ADFIT_GOGAME_DESKTOP_160X600?.trim() ?? "";
+const mobileUnit = import.meta.env.VITE_ADFIT_GOGAME_MOBILE_320X50?.trim() ?? "";
 
 interface Session {
   game: GameState;
@@ -1149,6 +1154,7 @@ function GameApp() {
   const language = getLanguage();
   const text = copy[language];
   const pageCourse = document.body.dataset.course as Difficulty | undefined;
+  const mobileAdRoot = document.getElementById("adfit-mobile-root");
   const [initial] = useState(readSession);
   const [game, setGame] = useState<GameState>(initial.game);
   const [difficulty, setDifficulty] = useState<Difficulty>(initial.difficulty);
@@ -1161,6 +1167,7 @@ function GameApp() {
   const [hintBusy, setHintBusy] = useState(false);
   const [hint, setHint] = useState<{ point: Point | null; reason: AiResponse["reason"] } | null>(null);
   const [coarsePointer, setCoarsePointer] = useState(() => window.matchMedia("(pointer: coarse)").matches);
+  const [adVariant] = useState<AdVariant>(() => selectInitialAdVariant());
   const [announcement, setAnnouncement] = useState(initial.restored ? text.restored : text.yourTurn);
   const requestId = useRef(0);
   const hintRequestId = useRef(0);
@@ -1173,6 +1180,8 @@ function GameApp() {
 
   const isHumanTurn = game.status === "playing" && game.currentPlayer === playerColor && !thinking;
   const mustConfirm = !coarsePointer && game.size >= 13;
+  const hasDesktopAd = adVariant === "desktop" && Boolean(desktopUnit);
+  const hasMobileAd = adVariant === "mobile" && Boolean(mobileUnit) && Boolean(mobileAdRoot);
   const computerColor = opponent(playerColor);
   const score = useMemo(() => calculateScore(game, deadStones), [game, deadStones]);
   const canUndo = !thinking && game.status === "playing" && undoStack.length >= 2 && game.currentPlayer === playerColor;
@@ -1224,6 +1233,14 @@ function GameApp() {
     if (hintTimer.current !== null) window.clearTimeout(hintTimer.current);
     hintWorker.current?.terminate();
   }, []);
+
+  useLayoutEffect(() => {
+    document.documentElement.classList.toggle("adfit-mobile-active", hasMobileAd);
+
+    return () => {
+      document.documentElement.classList.remove("adfit-mobile-active");
+    };
+  }, [hasMobileAd]);
 
   useEffect(() => {
     if (initialBoardScrollDone.current || pageCourse || window.location.hash || window.scrollY > 8) return;
@@ -1537,7 +1554,7 @@ function GameApp() {
           <div className="offline-chip"><span aria-hidden="true" />{text.offline}</div>
         </section>
 
-        <section className="game-shell" aria-label={text.title}>
+        <section className={`game-shell${hasDesktopAd ? " has-desktop-ad" : ""}`} aria-label={text.title}>
           <div className="board-column">
             <div className="game-status">
               <div className="turn-status">
@@ -1683,8 +1700,20 @@ function GameApp() {
               <p>{text.keyboardHelp}</p>
             </details>
           </aside>
+
+          {hasDesktopAd && (
+            <aside className="adfit-desktop-rail" aria-label={language === "ko" ? "광고" : "广告"}>
+              <AdFitSlot unitId={desktopUnit} width={160} height={600} placement="desktop-right" />
+            </aside>
+          )}
         </section>
       </main>
+      {hasMobileAd && mobileAdRoot
+        ? createPortal(
+            <AdFitSlot unitId={mobileUnit} width={320} height={50} placement="mobile-bottom" />,
+            mobileAdRoot,
+          )
+        : null}
     </>
   );
 }

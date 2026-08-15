@@ -5,6 +5,8 @@ const projectRoot = resolve(import.meta.dirname, "..");
 const distRoot = resolve(projectRoot, "dist");
 const siteUrl = (process.env.SITE_URL || "https://baduk-ai-course.onrender.com").replace(/\/$/, "");
 const googleSiteVerification = "43sVorkkUr7TBGfVu3khYLAtG1-110SLL7f5OqsNHZI";
+const adfitSdkUrl = "https://t1.kakaocdn.net/kas/static/ba.min.js";
+const adfitUnitIdPrefix = ["D", "A", "N", "-"].join("");
 const pages = [
   { path: "/", lang: "ko" },
   { path: "/ko/", lang: "ko" },
@@ -18,6 +20,27 @@ const pages = [
   { path: "/zh-cn/course/intermediate/", lang: "zh-CN", course: "intermediate" },
   { path: "/zh-cn/course/advanced/", lang: "zh-CN", course: "advanced" },
 ];
+const gamePaths = new Set([
+  "/ko/",
+  "/zh-cn/",
+  "/ko/course/beginner/",
+  "/ko/course/intermediate/",
+  "/ko/course/advanced/",
+  "/zh-cn/course/beginner/",
+  "/zh-cn/course/intermediate/",
+  "/zh-cn/course/advanced/",
+]);
+const sourceScanEntries = [
+  ".env.example",
+  "index.html",
+  "ko",
+  "zh-cn",
+  "src",
+  "vite.config.ts",
+  "scripts/validate-build.mjs",
+  "render.yaml",
+  "package.json",
+];
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -25,6 +48,22 @@ function assert(condition, message) {
 
 function htmlPath(path) {
   return path === "/" ? resolve(distRoot, "index.html") : resolve(distRoot, `.${path}`, "index.html");
+}
+
+async function collectFiles(entry) {
+  const target = resolve(projectRoot, entry);
+  try {
+    const entries = await readdir(target, { withFileTypes: true });
+    const files = [];
+    for (const child of entries) {
+      const childEntry = `${entry}/${child.name}`;
+      if (child.isDirectory()) files.push(...await collectFiles(childEntry));
+      else if (child.isFile()) files.push(resolve(projectRoot, childEntry));
+    }
+    return files;
+  } catch {
+    return [target];
+  }
 }
 
 for (const page of pages) {
@@ -40,8 +79,19 @@ for (const page of pages) {
   assert(html.includes('hreflang="ko"'), `${page.path}: missing Korean alternate`);
   assert(html.includes('hreflang="zh-CN"'), `${page.path}: missing Chinese alternate`);
   assert(html.includes('hreflang="x-default"'), `${page.path}: missing default alternate`);
-  if (page.path === "/") assert(html.includes('class="language-cards"'), "/: missing language chooser");
-  else assert(html.includes('id="app"'), `${page.path}: missing app mount`);
+  if (page.path === "/") {
+    assert(html.includes('class="language-cards"'), "/: missing language chooser");
+    assert(!html.includes('id="adfit-mobile-root"'), "/: root language chooser must not include mobile ad root");
+  } else {
+    assert(html.includes('id="app"'), `${page.path}: missing app mount`);
+  }
+  if (gamePaths.has(page.path)) {
+    assert(html.includes('class="page-frame"'), `${page.path}: missing page-frame wrapper`);
+    assert(html.includes('class="page-scroll-region"'), `${page.path}: missing page-scroll-region wrapper`);
+    assert(html.includes('id="adfit-mobile-root"'), `${page.path}: missing mobile ad root`);
+  } else {
+    assert(!html.includes('id="adfit-mobile-root"'), `${page.path}: unexpected mobile ad root`);
+  }
   if (page.course) assert(html.includes(`data-course="${page.course}"`), `${page.path}: incorrect course data`);
   if (page.page) assert(html.includes(`data-page="${page.page}"`), `${page.path}: incorrect page data`);
 
@@ -74,5 +124,18 @@ const assets = await readdir(resolve(distRoot, "assets"));
 assert(assets.some((file) => file.startsWith("main-") && file.endsWith(".js")), "assets: missing main bundle");
 assert(assets.some((file) => file.startsWith("ai.worker-") && file.endsWith(".js")), "assets: missing AI worker");
 assert(assets.some((file) => file.startsWith("styles-") && file.endsWith(".css")), "assets: missing stylesheet");
+
+const sourceFiles = (await Promise.all(sourceScanEntries.map(collectFiles))).flat();
+for (const file of sourceFiles) {
+  const text = await readFile(file, "utf8");
+  assert(!text.includes(adfitUnitIdPrefix), `${file}: real AdFit unit ID must not be hardcoded`);
+}
+
+let sdkUrlOccurrences = 0;
+for (const asset of assets.filter((file) => file.endsWith(".js"))) {
+  const text = await readFile(resolve(distRoot, "assets", asset), "utf8");
+  sdkUrlOccurrences += text.split(adfitSdkUrl).length - 1;
+}
+assert(sdkUrlOccurrences === 1, `assets: expected one AdFit SDK loader URL, found ${sdkUrlOccurrences}`);
 
 console.log(`Validated ${pages.length} pages, SEO files, JSON-LD and browser bundles.`);
