@@ -5,6 +5,7 @@ import react from "@vitejs/plugin-react";
 
 const defaultSiteUrl = "https://baduk-ai-course.onrender.com";
 const siteUrl = (process.env.SITE_URL || defaultSiteUrl).replace(/\/$/, "");
+const googleSiteVerification = "43sVorkkUr7TBGfVu3khYLAtG1-110SLL7f5OqsNHZI";
 
 const languageGroups = [
   { entries: ["/", "/ko/", "/zh-cn/"], ko: "/ko/", zh: "/zh-cn/", fallback: "/" },
@@ -146,10 +147,11 @@ function seoPlugin(): Plugin {
     name: "baduk-seo-files",
     transformIndexHtml(html) {
       const mobileMeta = '    <meta name="applicable-device" content="pc,mobile" />';
+      const googleMeta = `    <meta name="google-site-verification" content="${googleSiteVerification}" />`;
       const rssLink = `    <link rel="alternate" type="application/rss+xml" title="바둑 한 수 RSS" href="${siteUrl}/rss.xml" />`;
       return html
         .replaceAll("__SITE_URL__", siteUrl)
-        .replace("  </head>", `${mobileMeta}\n${rssLink}\n  </head>`);
+        .replace("  </head>", `${mobileMeta}\n${googleMeta}\n${rssLink}\n  </head>`);
     },
     closeBundle() {
       const now = new Date();

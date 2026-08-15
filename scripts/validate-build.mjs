@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 const projectRoot = resolve(import.meta.dirname, "..");
 const distRoot = resolve(projectRoot, "dist");
 const siteUrl = (process.env.SITE_URL || "https://baduk-ai-course.onrender.com").replace(/\/$/, "");
+const googleSiteVerification = "43sVorkkUr7TBGfVu3khYLAtG1-110SLL7f5OqsNHZI";
 const pages = [
   { path: "/", lang: "ko" },
   { path: "/ko/", lang: "ko" },
@@ -33,6 +34,7 @@ for (const page of pages) {
   assert(html.includes("<h1"), `${page.path}: missing static H1`);
   assert(html.includes("<meta name=\"description\""), `${page.path}: missing description`);
   assert(html.includes('name="applicable-device" content="pc,mobile"'), `${page.path}: missing Baidu mobile device hint`);
+  assert(html.includes(`name="google-site-verification" content="${googleSiteVerification}"`), `${page.path}: missing Google site verification`);
   assert(html.includes('type="application/rss+xml"'), `${page.path}: missing RSS discovery link`);
   assert(html.includes(`rel="canonical" href="${siteUrl}${page.path}"`), `${page.path}: incorrect canonical`);
   assert(html.includes('hreflang="ko"'), `${page.path}: missing Korean alternate`);
