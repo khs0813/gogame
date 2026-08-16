@@ -73,6 +73,9 @@ for (const page of pages) {
   assert(html.includes(`<html lang="${page.lang}">`), `${page.path}: incorrect document language`);
   assert(html.includes("<h1"), `${page.path}: missing static H1`);
   assert(html.includes("<meta name=\"description\""), `${page.path}: missing description`);
+  assert(html.includes('<meta property="og:title"'), `${page.path}: missing Open Graph title`);
+  assert(html.includes('<meta property="og:description"'), `${page.path}: missing Open Graph description`);
+  assert(html.includes(`<meta property="og:url" content="${siteUrl}${page.path}"`), `${page.path}: incorrect Open Graph URL`);
   assert(html.includes('name="applicable-device" content="pc,mobile"'), `${page.path}: missing Baidu mobile device hint`);
   assert(html.includes(`name="google-site-verification" content="${googleSiteVerification}"`), `${page.path}: missing Google site verification`);
   assert(html.includes(`name="naver-site-verification" content="${naverSiteVerification}"`), `${page.path}: missing Naver site verification`);
