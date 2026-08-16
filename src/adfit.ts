@@ -32,3 +32,12 @@ export function ensureAdFitSdk(): void {
   script.dataset.gogameAdfitSdk = "true";
   document.body.appendChild(script);
 }
+
+export function destroyAdFitElement(element: HTMLElement): void {
+  try {
+    const adfit = (window as Window & { adfit?: { destroy?: (target: HTMLElement) => void } }).adfit;
+    adfit?.destroy?.(element);
+  } catch {
+    // AdFit cleanup is best-effort; page teardown should never fail on SDK state.
+  }
+}

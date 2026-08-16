@@ -1,5 +1,5 @@
-import { memo, useEffect } from "react";
-import { ensureAdFitSdk } from "./adfit";
+import { memo, useEffect, useRef } from "react";
+import { destroyAdFitElement, ensureAdFitSdk } from "./adfit";
 
 export type AdFitVariant = "desktop" | "mobile";
 export type AdFitWidth = 728 | 320;
@@ -13,8 +13,18 @@ export interface AdFitSlotProps {
 }
 
 function AdFitSlot({ unitId, width, height, variant }: AdFitSlotProps) {
+  const adElementRef = useRef<HTMLModElement>(null);
+
   useEffect(() => {
-    ensureAdFitSdk();
+    const element = adElementRef.current;
+    const frameId = window.requestAnimationFrame(() => {
+      ensureAdFitSdk();
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      if (element) destroyAdFitElement(element);
+    };
   }, [unitId]);
 
   return (
@@ -24,6 +34,7 @@ function AdFitSlot({ unitId, width, height, variant }: AdFitSlotProps) {
       style={{ width, height, minWidth: width, minHeight: height }}
     >
       <ins
+        ref={adElementRef}
         className="kakao_ad_area"
         style={{ display: "none", width: "100%" }}
         data-ad-unit={unitId}
