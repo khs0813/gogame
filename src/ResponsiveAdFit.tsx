@@ -4,7 +4,12 @@ import { selectInitialAdVariant, type AdVariant } from "./adfit";
 
 const desktopMediaQuery = "(min-width: 768px)";
 
-export type ResponsiveAdFitPlacement = "home-primary" | "home-secondary" | "course-primary" | "course-secondary";
+export type ResponsiveAdFitPlacement =
+  | "home-primary"
+  | "home-secondary"
+  | "course-primary"
+  | "course-secondary"
+  | "rules-primary";
 
 export interface ResponsiveAdFitProps {
   desktopUnit: string;

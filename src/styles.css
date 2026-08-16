@@ -113,6 +113,7 @@ main { width: min(1440px, calc(100% - 48px)); margin: 0 auto; }
 .control-panel > section + section, .control-panel > section + details, .control-panel > details { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--line); }
 .adfit-slot { width: 100%; display: flex; justify-content: center; align-items: center; margin: 32px auto; overflow: visible; }
 .adfit-slot--home-primary, .adfit-slot--course-primary { margin-top: 0; margin-bottom: 40px; }
+.adfit-slot--rules-primary { margin-top: 2px; margin-bottom: 38px; }
 .adfit-slot--home-secondary { margin-top: 40px; margin-bottom: 32px; }
 .adfit-slot--course-secondary { margin-top: 44px; margin-bottom: 32px; }
 .adfit-unit { flex: 0 0 auto; display: block; overflow: visible; line-height: 0; }
@@ -327,6 +328,7 @@ button.ghost { background: transparent; }
   .offline-chip { margin-top: 20px; }
   .adfit-slot { margin-top: 32px; margin-bottom: 32px; }
   .adfit-slot--home-primary, .adfit-slot--course-primary { margin-top: 0; margin-bottom: 36px; }
+  .adfit-slot--rules-primary { margin-top: 0; margin-bottom: 34px; }
   .game-shell { gap: 14px; margin-bottom: 60px; }
   .board-column, .control-panel { border-radius: 20px; }
   .board-column { padding: 11px; }

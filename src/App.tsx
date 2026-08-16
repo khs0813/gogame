@@ -33,6 +33,8 @@ const homeDesktopUnit = import.meta.env.VITE_ADFIT_HOME_DESKTOP?.trim() ?? "";
 const homeMobileUnit = import.meta.env.VITE_ADFIT_HOME_MOBILE?.trim() ?? "";
 const courseDesktopUnit = import.meta.env.VITE_ADFIT_COURSE_DESKTOP?.trim() ?? "";
 const courseMobileUnit = import.meta.env.VITE_ADFIT_COURSE_MOBILE?.trim() ?? "";
+const rulesDesktopUnit = import.meta.env.VITE_ADFIT_RULES_DESKTOP?.trim() || courseDesktopUnit;
+const rulesMobileUnit = import.meta.env.VITE_ADFIT_RULES_MOBILE?.trim() || courseMobileUnit;
 const homeSecondaryDesktopUnit = import.meta.env.VITE_ADFIT_HOME_SECONDARY_DESKTOP?.trim() ?? "";
 const homeSecondaryMobileUnit = import.meta.env.VITE_ADFIT_HOME_SECONDARY_MOBILE?.trim() ?? "";
 const courseSecondaryDesktopUnit = import.meta.env.VITE_ADFIT_COURSE_SECONDARY_DESKTOP?.trim() ?? "";
@@ -1100,6 +1102,7 @@ function RulesPage() {
   const text = copy[language];
   const page = rulePages[language];
   const otherLanguage: Language = language === "ko" ? "zh-cn" : "ko";
+  const adLabel = language === "ko" ? "광고" : "广告";
   return (
     <>
       <SiteHeader language={language} text={text} alternateHref={rulesPath(otherLanguage)} rulesCurrent />
@@ -1109,6 +1112,12 @@ function RulesPage() {
           <h1 id="rules-title">{page.title}</h1>
           <p>{page.lead}</p>
         </section>
+        <ResponsiveAdFit
+          desktopUnit={rulesDesktopUnit}
+          mobileUnit={rulesMobileUnit}
+          placement="rules-primary"
+          label={adLabel}
+        />
         <section className="rules-quick-grid" aria-label={language === "ko" ? "규칙 핵심 요약" : "规则核心摘要"}>
           {page.quick.map((item) => (
             <div key={item.label} className="rules-quick-item">
