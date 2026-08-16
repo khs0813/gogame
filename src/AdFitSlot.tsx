@@ -1,24 +1,26 @@
 import { memo, useEffect } from "react";
 import { ensureAdFitSdk } from "./adfit";
 
-export type AdFitPlacement = "desktop-right" | "mobile-bottom";
+export type AdFitVariant = "desktop" | "mobile";
+export type AdFitWidth = 728 | 320;
+export type AdFitHeight = 90 | 100;
 
 export interface AdFitSlotProps {
   unitId: string;
-  width: 160 | 320;
-  height: 600 | 50;
-  placement: AdFitPlacement;
+  width: AdFitWidth;
+  height: AdFitHeight;
+  variant: AdFitVariant;
 }
 
-function AdFitSlot({ unitId, width, height, placement }: AdFitSlotProps) {
+function AdFitSlot({ unitId, width, height, variant }: AdFitSlotProps) {
   useEffect(() => {
     ensureAdFitSdk();
-  }, []);
+  }, [unitId]);
 
   return (
     <div
-      className={`adfit-slot-shell adfit-slot-shell--${placement}`}
-      data-adfit-placement={placement}
+      className={`adfit-unit adfit-unit--${variant}`}
+      data-adfit-variant={variant}
       style={{ width, height, minWidth: width, minHeight: height }}
     >
       <ins
@@ -33,4 +35,3 @@ function AdFitSlot({ unitId, width, height, placement }: AdFitSlotProps) {
 }
 
 export default memo(AdFitSlot);
-

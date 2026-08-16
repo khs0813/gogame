@@ -33,48 +33,7 @@ body {
   display: contents;
 }
 
-#adfit-mobile-root {
-  display: none;
-}
-
-html.adfit-mobile-active,
-html.adfit-mobile-active body {
-  height: 100%;
-  overflow: hidden;
-}
-
-html.adfit-mobile-active .page-frame {
-  height: 100vh;
-  height: 100dvh;
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  overflow: hidden;
-}
-
-html.adfit-mobile-active .page-scroll-region {
-  min-height: 0;
-  display: block;
-  overflow-x: hidden;
-  overflow-y: auto;
-  scroll-behavior: smooth;
-  scroll-padding-bottom: 24px;
-  overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
-}
-
-html.adfit-mobile-active #adfit-mobile-root {
-  min-height: calc(66px + env(safe-area-inset-bottom));
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding:
-    16px
-    max(0px, env(safe-area-inset-right))
-    env(safe-area-inset-bottom)
-    max(0px, env(safe-area-inset-left));
-  border-top: 1px solid rgba(23, 39, 32, 0.16);
-  background: var(--paper);
-}
+.adfit-portal-root { display: contents; }
 button, select { font: inherit; }
 button, a, select, summary { -webkit-tap-highlight-color: transparent; }
 a { color: inherit; }
@@ -142,6 +101,8 @@ main { width: min(1440px, calc(100% - 48px)); margin: 0 auto; }
 .eyebrow { margin: 0 0 10px; color: var(--cinnabar); font-size: 12px; line-height: 1.2; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
 .hero-copy h1 { max-width: 900px; margin: 0; color: var(--ink); font-size: clamp(38px, 5.2vw, 76px); line-height: .98; letter-spacing: -.065em; }
 .hero-lead { max-width: 790px; margin: 22px 0 0; color: #526159; font-size: clamp(16px, 1.5vw, 21px); line-height: 1.72; letter-spacing: -.015em; }
+.hero-cta { width: fit-content; min-height: 48px; display: inline-flex; align-items: center; justify-content: center; margin-top: 26px; padding: 12px 16px; border-radius: 12px; background: var(--forest); color: #fff; font-weight: 850; text-decoration: none; box-shadow: 0 12px 26px rgba(23,55,45,.16); }
+.hero-cta:hover { background: var(--forest-2); }
 .offline-chip { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 9px; margin-bottom: 8px; padding: 11px 15px; border: 1px solid rgba(23,55,45,.18); border-radius: 999px; background: rgba(255,255,255,.5); color: #3a4b43; font-size: 12px; font-weight: 800; }
 .offline-chip span { width: 8px; height: 8px; border-radius: 50%; background: #32a16d; box-shadow: 0 0 0 5px rgba(50,161,109,.12); }
 
@@ -150,10 +111,13 @@ main { width: min(1440px, calc(100% - 48px)); margin: 0 auto; }
 .board-column { padding: clamp(14px, 2vw, 28px); }
 .control-panel { padding: 26px; position: sticky; top: 18px; }
 .control-panel > section + section, .control-panel > section + details, .control-panel > details { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--line); }
-.adfit-desktop-rail { display: none; }
-.adfit-slot-shell { flex: 0 0 auto; overflow: hidden; }
-.adfit-slot-shell--desktop-right { width: 160px; height: 600px; }
-.adfit-slot-shell--mobile-bottom { width: 320px; height: 50px; max-width: none; }
+.adfit-slot { width: 100%; display: flex; justify-content: center; align-items: center; margin: 32px auto; overflow: visible; }
+.adfit-slot--home-primary, .adfit-slot--course-primary { margin-top: 0; margin-bottom: 40px; }
+.adfit-slot--home-secondary { margin-top: 40px; margin-bottom: 32px; }
+.adfit-slot--course-secondary { margin-top: 44px; margin-bottom: 32px; }
+.adfit-unit { flex: 0 0 auto; display: block; overflow: visible; line-height: 0; }
+.adfit-unit--desktop { width: 728px; height: 90px; }
+.adfit-unit--mobile { width: 320px; height: 100px; max-width: 100vw; }
 
 .game-status { min-height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 16px; }
 .turn-status { display: flex; align-items: center; gap: 13px; min-width: 0; }
@@ -260,6 +224,7 @@ button.ghost { background: transparent; }
 .course-link-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
 .course-link-card b { color: var(--forest); font-size: 13px; }
 .faq-list { display: grid; gap: 10px; margin-top: 54px; }
+.adfit-portal-root + .faq-list { margin-top: 32px; }
 .faq-list h2 { margin: 0 0 10px; font-size: 26px; letter-spacing: -.035em; }
 .faq-list details { padding: 18px 20px; }
 .faq-list summary { cursor: pointer; font-weight: 850; }
@@ -269,6 +234,7 @@ button.ghost { background: transparent; }
 .course-article h3 { margin: 38px 0 8px; font-size: 21px; }
 .course-article p { color: var(--muted); line-height: 1.8; }
 .course-article nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 38px; }
+.adfit-portal-root + nav { margin-top: 32px; }
 .course-article nav a { padding: 10px 13px; border: 1px solid var(--line); border-radius: 999px; text-decoration: none; font-size: 12px; font-weight: 800; }
 .course-article nav a:hover { background: #fff; }
 
@@ -336,24 +302,6 @@ button.ghost { background: transparent; }
 @keyframes pulse { 50% { transform: scale(.75); opacity: .65; } }
 @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-8px); } }
 
-@media (min-width: 1280px) {
-  .game-shell.has-desktop-ad {
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 340px) 176px;
-    column-gap: 24px;
-  }
-
-  .adfit-desktop-rail {
-    width: 160px;
-    min-width: 160px;
-    min-height: 600px;
-    display: block;
-    position: sticky;
-    top: 18px;
-    align-self: start;
-    justify-self: end;
-  }
-}
-
 @media (max-width: 1040px) {
   .game-shell { grid-template-columns: 1fr; }
   .control-panel { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
@@ -375,7 +323,10 @@ button.ghost { background: transparent; }
   .hero-copy { display: block; padding: 42px 2px 24px; }
   .hero-copy h1 { font-size: clamp(38px, 12vw, 58px); }
   .hero-lead { margin-top: 16px; font-size: 15px; }
+  .hero-cta { margin-top: 22px; }
   .offline-chip { margin-top: 20px; }
+  .adfit-slot { margin-top: 32px; margin-bottom: 32px; }
+  .adfit-slot--home-primary, .adfit-slot--course-primary { margin-top: 0; margin-bottom: 36px; }
   .game-shell { gap: 14px; margin-bottom: 60px; }
   .board-column, .control-panel { border-radius: 20px; }
   .board-column { padding: 11px; }

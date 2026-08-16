@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { createPortal } from "react-dom";
-import AdFitSlot from "./AdFitSlot";
 import Board, { coordinateLabel } from "./Board";
-import { selectInitialAdVariant, type AdVariant } from "./adfit";
+import ResponsiveAdFit from "./ResponsiveAdFit";
 import { alternatePath, copy, getInitialDifficulty, getLanguage, type Language } from "./content";
 import { chooseAiMove } from "./game/ai";
 import {
@@ -30,8 +29,10 @@ import {
 
 const storageKey = "baduk-one-session-v2";
 const courseOrder: Difficulty[] = ["beginner", "intermediate", "advanced"];
-const desktopUnit = import.meta.env.VITE_ADFIT_GOGAME_DESKTOP_160X600?.trim() ?? "";
-const mobileUnit = import.meta.env.VITE_ADFIT_GOGAME_MOBILE_320X50?.trim() ?? "";
+const homeDesktopUnit = import.meta.env.VITE_ADFIT_HOME_DESKTOP?.trim() ?? "";
+const homeMobileUnit = import.meta.env.VITE_ADFIT_HOME_MOBILE?.trim() ?? "";
+const courseDesktopUnit = import.meta.env.VITE_ADFIT_COURSE_DESKTOP?.trim() ?? "";
+const courseMobileUnit = import.meta.env.VITE_ADFIT_COURSE_MOBILE?.trim() ?? "";
 
 interface Session {
   game: GameState;
@@ -1154,7 +1155,7 @@ function GameApp() {
   const language = getLanguage();
   const text = copy[language];
   const pageCourse = document.body.dataset.course as Difficulty | undefined;
-  const mobileAdRoot = document.getElementById("adfit-mobile-root");
+  const secondaryAdRoot = document.getElementById("adfit-secondary-root");
   const [initial] = useState(readSession);
   const [game, setGame] = useState<GameState>(initial.game);
   const [difficulty, setDifficulty] = useState<Difficulty>(initial.difficulty);
@@ -1167,21 +1168,20 @@ function GameApp() {
   const [hintBusy, setHintBusy] = useState(false);
   const [hint, setHint] = useState<{ point: Point | null; reason: AiResponse["reason"] } | null>(null);
   const [coarsePointer, setCoarsePointer] = useState(() => window.matchMedia("(pointer: coarse)").matches);
-  const [adVariant] = useState<AdVariant>(() => selectInitialAdVariant());
   const [announcement, setAnnouncement] = useState(initial.restored ? text.restored : text.yourTurn);
   const requestId = useRef(0);
   const hintRequestId = useRef(0);
   const hintTimer = useRef<number | null>(null);
   const hintWorker = useRef<Worker | null>(null);
   const latestFingerprint = useRef(gameFingerprint(game));
-  const boardFrameRef = useRef<HTMLDivElement>(null);
-  const initialBoardScrollDone = useRef(false);
   latestFingerprint.current = gameFingerprint(game);
 
   const isHumanTurn = game.status === "playing" && game.currentPlayer === playerColor && !thinking;
   const mustConfirm = !coarsePointer && game.size >= 13;
-  const hasDesktopAd = adVariant === "desktop" && Boolean(desktopUnit);
-  const hasMobileAd = adVariant === "mobile" && Boolean(mobileUnit) && Boolean(mobileAdRoot);
+  const adUnits = pageCourse
+    ? { desktop: courseDesktopUnit, mobile: courseMobileUnit }
+    : { desktop: homeDesktopUnit, mobile: homeMobileUnit };
+  const adLabel = language === "ko" ? "광고" : "广告";
   const computerColor = opponent(playerColor);
   const score = useMemo(() => calculateScore(game, deadStones), [game, deadStones]);
   const canUndo = !thinking && game.status === "playing" && undoStack.length >= 2 && game.currentPlayer === playerColor;
@@ -1233,29 +1233,6 @@ function GameApp() {
     if (hintTimer.current !== null) window.clearTimeout(hintTimer.current);
     hintWorker.current?.terminate();
   }, []);
-
-  useLayoutEffect(() => {
-    document.documentElement.classList.toggle("adfit-mobile-active", hasMobileAd);
-
-    return () => {
-      document.documentElement.classList.remove("adfit-mobile-active");
-    };
-  }, [hasMobileAd]);
-
-  useEffect(() => {
-    if (initialBoardScrollDone.current || pageCourse || window.location.hash || window.scrollY > 8) return;
-    const frame = boardFrameRef.current;
-    const board = frame?.querySelector<SVGSVGElement>(".go-board");
-    if (!frame || !board) return;
-
-    initialBoardScrollDone.current = true;
-    const isCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    window.requestAnimationFrame(() => {
-      frame.scrollIntoView({ behavior: isCoarsePointer || prefersReducedMotion ? "auto" : "smooth", block: "center", inline: "nearest" });
-      if (!isCoarsePointer) board.focus({ preventScroll: true });
-    });
-  }, [pageCourse]);
 
   useEffect(() => {
     setCursor({ x: Math.floor(game.size / 2), y: Math.floor(game.size / 2) });
@@ -1550,11 +1527,23 @@ function GameApp() {
             <p className="eyebrow">{text.eyebrow}</p>
             <h1 id="game-title">{pageTitle}</h1>
             <p className="hero-lead">{text.lead}</p>
+            {!pageCourse && (
+              <a className="hero-cta" href="#learn-title">
+                {language === "ko" ? "바둑 코스 살펴보기" : "查看围棋课程"}
+              </a>
+            )}
           </div>
           <div className="offline-chip"><span aria-hidden="true" />{text.offline}</div>
         </section>
 
-        <section className={`game-shell${hasDesktopAd ? " has-desktop-ad" : ""}`} aria-label={text.title}>
+        <ResponsiveAdFit
+          desktopUnit={adUnits.desktop}
+          mobileUnit={adUnits.mobile}
+          placement={pageCourse ? "course-primary" : "home-primary"}
+          label={adLabel}
+        />
+
+        <section className="game-shell" aria-label={text.title}>
           <div className="board-column">
             <div className="game-status">
               <div className="turn-status">
@@ -1569,7 +1558,7 @@ function GameApp() {
                 ? "바둑판 조작: 화살표 키로 교차점을 이동하고 Enter 또는 Space로 선택하거나 착수합니다. Esc는 선택 취소, P는 패스입니다."
                 : "棋盘操作：用方向键移动交叉点，按 Enter 或空格选择或落子，Esc 取消，P 停一手。"}
             </p>
-            <div ref={boardFrameRef} className={`board-frame ${thinking ? "is-thinking" : ""}`}>
+            <div className={`board-frame ${thinking ? "is-thinking" : ""}`}>
               <Board
                 state={game}
                 pending={pending}
@@ -1701,17 +1690,17 @@ function GameApp() {
             </details>
           </aside>
 
-          {hasDesktopAd && (
-            <aside className="adfit-desktop-rail" aria-label={language === "ko" ? "광고" : "广告"}>
-              <AdFitSlot unitId={desktopUnit} width={160} height={600} placement="desktop-right" />
-            </aside>
-          )}
         </section>
       </main>
-      {hasMobileAd && mobileAdRoot
+      {secondaryAdRoot
         ? createPortal(
-            <AdFitSlot unitId={mobileUnit} width={320} height={50} placement="mobile-bottom" />,
-            mobileAdRoot,
+            <ResponsiveAdFit
+              desktopUnit={adUnits.desktop}
+              mobileUnit={adUnits.mobile}
+              placement={pageCourse ? "course-secondary" : "home-secondary"}
+              label={adLabel}
+            />,
+            secondaryAdRoot,
           )
         : null}
     </>

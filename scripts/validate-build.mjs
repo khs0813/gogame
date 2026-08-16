@@ -86,16 +86,17 @@ for (const page of pages) {
   assert(html.includes('hreflang="x-default"'), `${page.path}: missing default alternate`);
   if (page.path === "/") {
     assert(html.includes('class="language-cards"'), "/: missing language chooser");
-    assert(!html.includes('id="adfit-mobile-root"'), "/: root language chooser must not include mobile ad root");
+    assert(!html.includes('id="adfit-secondary-root"'), "/: root language chooser must not include ads");
   } else {
     assert(html.includes('id="app"'), `${page.path}: missing app mount`);
   }
+  assert(!html.includes('id="adfit-mobile-root"'), `${page.path}: legacy mobile bottom ad root must not be present`);
   if (gamePaths.has(page.path)) {
     assert(html.includes('class="page-frame"'), `${page.path}: missing page-frame wrapper`);
     assert(html.includes('class="page-scroll-region"'), `${page.path}: missing page-scroll-region wrapper`);
-    assert(html.includes('id="adfit-mobile-root"'), `${page.path}: missing mobile ad root`);
+    assert(html.includes('id="adfit-secondary-root"'), `${page.path}: missing secondary ad portal root`);
   } else {
-    assert(!html.includes('id="adfit-mobile-root"'), `${page.path}: unexpected mobile ad root`);
+    assert(!html.includes('id="adfit-secondary-root"'), `${page.path}: unexpected secondary ad portal root`);
   }
   if (page.course) assert(html.includes(`data-course="${page.course}"`), `${page.path}: incorrect course data`);
   if (page.page) assert(html.includes(`data-page="${page.page}"`), `${page.path}: incorrect page data`);
