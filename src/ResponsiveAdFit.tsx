@@ -9,7 +9,8 @@ export type ResponsiveAdFitPlacement =
   | "home-secondary"
   | "course-primary"
   | "course-secondary"
-  | "rules-primary";
+  | "rules-primary"
+  | "rules-secondary";
 
 export interface ResponsiveAdFitProps {
   desktopUnit: string;

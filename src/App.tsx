@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { createPortal } from "react-dom";
 import Board, { coordinateLabel } from "./Board";
 import ResponsiveAdFit from "./ResponsiveAdFit";
@@ -35,6 +35,8 @@ const courseDesktopUnit = import.meta.env.VITE_ADFIT_COURSE_DESKTOP?.trim() ?? "
 const courseMobileUnit = import.meta.env.VITE_ADFIT_COURSE_MOBILE?.trim() ?? "";
 const rulesDesktopUnit = import.meta.env.VITE_ADFIT_RULES_DESKTOP?.trim() || courseDesktopUnit;
 const rulesMobileUnit = import.meta.env.VITE_ADFIT_RULES_MOBILE?.trim() || courseMobileUnit;
+const rulesSecondaryDesktopUnit = import.meta.env.VITE_ADFIT_RULES_SECONDARY_DESKTOP?.trim() ?? "";
+const rulesSecondaryMobileUnit = import.meta.env.VITE_ADFIT_RULES_SECONDARY_MOBILE?.trim() ?? "";
 const homeSecondaryDesktopUnit = import.meta.env.VITE_ADFIT_HOME_SECONDARY_DESKTOP?.trim() ?? "";
 const homeSecondaryMobileUnit = import.meta.env.VITE_ADFIT_HOME_SECONDARY_MOBILE?.trim() ?? "";
 const courseSecondaryDesktopUnit = import.meta.env.VITE_ADFIT_COURSE_SECONDARY_DESKTOP?.trim() ?? "";
@@ -1085,6 +1087,11 @@ function SiteHeader({
           <a href={rulesPath(language)} aria-current={rulesCurrent ? "page" : undefined}>
             {rulePages[language].rulesLink}
           </a>
+          {rulesCurrent && (
+            <a href={`/${language}/`}>
+              {language === "ko" ? "대국 시작" : "开始对局"}
+            </a>
+          )}
         </nav>
         <nav className="language-nav" aria-label={text.language}>
           <span>{rulePages[language].languageName}</span>
@@ -1103,6 +1110,10 @@ function RulesPage() {
   const page = rulePages[language];
   const otherLanguage: Language = language === "ko" ? "zh-cn" : "ko";
   const adLabel = language === "ko" ? "광고" : "广告";
+  const secondaryAdUnits = {
+    desktop: uniqueSecondaryUnit(rulesSecondaryDesktopUnit || homeDesktopUnit, rulesDesktopUnit),
+    mobile: uniqueSecondaryUnit(rulesSecondaryMobileUnit || homeMobileUnit, rulesMobileUnit),
+  };
   return (
     <>
       <SiteHeader language={language} text={text} alternateHref={rulesPath(otherLanguage)} rulesCurrent />
@@ -1127,18 +1138,28 @@ function RulesPage() {
           ))}
         </section>
         <article className="rules-article">
-          {page.sections.map((section) => (
-            <section className="rules-section" key={section.heading}>
-              <div className="rules-section-copy">
-                <p className="eyebrow">{section.eyebrow}</p>
-                <h2>{section.heading}</h2>
-                {section.body.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-                <ul>
-                  {section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
-                </ul>
-              </div>
-              {section.diagram && <RuleDiagram diagram={section.diagram} />}
-            </section>
+          {page.sections.map((section, index) => (
+            <Fragment key={section.heading}>
+              <section className="rules-section">
+                <div className="rules-section-copy">
+                  <p className="eyebrow">{section.eyebrow}</p>
+                  <h2>{section.heading}</h2>
+                  {section.body.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+                  <ul>
+                    {section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                  </ul>
+                </div>
+                {section.diagram && <RuleDiagram diagram={section.diagram} />}
+              </section>
+              {index === 0 && (
+                <ResponsiveAdFit
+                  desktopUnit={secondaryAdUnits.desktop}
+                  mobileUnit={secondaryAdUnits.mobile}
+                  placement="rules-secondary"
+                  label={adLabel}
+                />
+              )}
+            </Fragment>
           ))}
           <section className="rules-glossary" aria-labelledby="rules-glossary-title">
             <h2 id="rules-glossary-title">{page.glossaryTitle}</h2>
