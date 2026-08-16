@@ -33,6 +33,10 @@ const homeDesktopUnit = import.meta.env.VITE_ADFIT_HOME_DESKTOP?.trim() ?? "";
 const homeMobileUnit = import.meta.env.VITE_ADFIT_HOME_MOBILE?.trim() ?? "";
 const courseDesktopUnit = import.meta.env.VITE_ADFIT_COURSE_DESKTOP?.trim() ?? "";
 const courseMobileUnit = import.meta.env.VITE_ADFIT_COURSE_MOBILE?.trim() ?? "";
+const homeSecondaryDesktopUnit = import.meta.env.VITE_ADFIT_HOME_SECONDARY_DESKTOP?.trim() ?? "";
+const homeSecondaryMobileUnit = import.meta.env.VITE_ADFIT_HOME_SECONDARY_MOBILE?.trim() ?? "";
+const courseSecondaryDesktopUnit = import.meta.env.VITE_ADFIT_COURSE_SECONDARY_DESKTOP?.trim() ?? "";
+const courseSecondaryMobileUnit = import.meta.env.VITE_ADFIT_COURSE_SECONDARY_MOBILE?.trim() ?? "";
 
 interface Session {
   game: GameState;
@@ -82,6 +86,10 @@ function readSession(): Session {
 
 function samePoint(a: Point | null, b: Point): boolean {
   return Boolean(a && a.x === b.x && a.y === b.y);
+}
+
+function uniqueSecondaryUnit(unitId: string, primaryUnitId: string): string {
+  return unitId && unitId !== primaryUnitId ? unitId : "";
 }
 
 function gameFingerprint(game: GameState): string {
@@ -1181,6 +1189,15 @@ function GameApp() {
   const adUnits = pageCourse
     ? { desktop: courseDesktopUnit, mobile: courseMobileUnit }
     : { desktop: homeDesktopUnit, mobile: homeMobileUnit };
+  const secondaryAdUnits = pageCourse
+    ? {
+        desktop: uniqueSecondaryUnit(courseSecondaryDesktopUnit, courseDesktopUnit),
+        mobile: uniqueSecondaryUnit(courseSecondaryMobileUnit, courseMobileUnit),
+      }
+    : {
+        desktop: uniqueSecondaryUnit(homeSecondaryDesktopUnit, homeDesktopUnit),
+        mobile: uniqueSecondaryUnit(homeSecondaryMobileUnit, homeMobileUnit),
+      };
   const adLabel = language === "ko" ? "광고" : "广告";
   const computerColor = opponent(playerColor);
   const score = useMemo(() => calculateScore(game, deadStones), [game, deadStones]);
@@ -1695,8 +1712,8 @@ function GameApp() {
       {secondaryAdRoot
         ? createPortal(
             <ResponsiveAdFit
-              desktopUnit={adUnits.desktop}
-              mobileUnit={adUnits.mobile}
+              desktopUnit={secondaryAdUnits.desktop}
+              mobileUnit={secondaryAdUnits.mobile}
               placement={pageCourse ? "course-secondary" : "home-secondary"}
               label={adLabel}
             />,
